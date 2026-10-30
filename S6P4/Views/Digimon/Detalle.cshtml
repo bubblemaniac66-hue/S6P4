@@ -1,0 +1,120 @@
+﻿
+@model S6P4.Models.DigimonDetalleViewModel
+@using S6P4.Models
+@{
+    Layout = "~/Views/Shared/_LayoutDigivice.cshtml";
+    var d = Model.Digimon;
+    ViewBag.Title = d != null ? d.Name : "No encontrado";
+}
+
+@if (d == null)
+{
+    <aside class="lado">
+        <div class="radar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <a class="btn" href="@Url.Action("Index", "Digimon")">◀ VOLVER</a>
+    </aside>
+    <section class="vidrio">
+        <div class="alerta error">⚠ @(Model.Error ?? "Digimon no encontrado.")</div>
+    </section>
+}
+else
+{
+    <aside class="lado">
+        <div class="vidrio retrato @("at-" + DigimonHelper.Slug(d.AtributoPrincipal))">
+            <span class="numero">@d.NumeroFormateado</span>
+            <img src="@d.ImagenUrl" alt="@d.Name" />
+        </div>
+
+        @if (d.Attributes != null && d.Attributes.Any())
+        {
+            <div class="chips" style="justify-content:center">
+                @foreach (var a in d.Attributes)
+                {
+                    <span class="chip @("at-" + DigimonHelper.Slug(a.Attribute))">@DigimonHelper.AtributoEs(a.Attribute)</span>
+                }
+            </div>
+        }
+
+        <div class="mandos">
+            <div class="dial" aria-hidden="true"></div>
+            <a class="btn" style="width:auto" href="@Url.Action("Index", "Digimon")">◀ VOLVER</a>
+        </div>
+    </aside>
+
+    <section class="vidrio info-der @("at-" + DigimonHelper.Slug(d.AtributoPrincipal))">
+        <h1>@(d.Name + (d.XAntibody ? " (X)" : ""))</h1>
+
+        <div class="datos">
+            <div class="dato"><b>@(d.Levels != null && d.Levels.Any() ? string.Join(", ", d.Levels.Select(l => DigimonHelper.NivelEs(l.Level))) : "—")</b><span>Nivel</span></div>
+            <div class="dato"><b>@(d.Types != null && d.Types.Any() ? string.Join(", ", d.Types.Select(t => t.Type)) : "—")</b><span>Tipo</span></div>
+            <div class="dato"><b>@(string.IsNullOrEmpty(d.ReleaseDate) ? "—" : d.ReleaseDate)</b><span>Lanzamiento</span></div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(d.Descripcion))
+        {
+            <p class="descripcion">@d.Descripcion</p>
+        }
+
+        @if (d.Fields != null && d.Fields.Any())
+        {
+            <h3>CAMPOS</h3>
+            <div class="campos">
+                @foreach (var f in d.Fields)
+                {
+                    <span class="campo-ico">
+                        @if (!string.IsNullOrEmpty(f.Image))
+                        {<img src="@f.Image" alt="" />}
+                        @f.Field
+                    </span>
+                }
+            </div>
+        }
+
+        @if (d.Skills != null && d.Skills.Any())
+        {
+            <h3>HABILIDADES</h3>
+            foreach (var s in d.Skills)
+            {
+                <div class="habilidad">
+                    <b>@s.Skill</b>@if (!string.IsNullOrEmpty(s.Translation))
+                    {<em>@s.Translation</em>}
+                    @if (!string.IsNullOrEmpty(s.Description))
+                    {<p>@s.Description</p>}
+                </div>
+            }
+        }
+
+        @if (d.PriorEvolutions != null && d.PriorEvolutions.Any())
+        {
+            <h3>EVOLUCIONA DE</h3>
+            <div class="evos">
+                @foreach (var e in d.PriorEvolutions)
+                {
+                    <a class="evo" href="@Url.Action("Detalle", "Digimon", new { id = e.Id })">
+                        @if (!string.IsNullOrEmpty(e.Image))
+                        {<img src="@e.Image" alt="" />}
+                        <span>@(e.Digimon)@if (!string.IsNullOrEmpty(e.Condition))
+                        {<small>@e.Condition</small>}</span>
+                    </a>
+                }
+            </div>
+        }
+
+        @if (d.NextEvolutions != null && d.NextEvolutions.Any())
+        {
+            <h3>EVOLUCIONA A</h3>
+            <div class="evos">
+                @foreach (var e in d.NextEvolutions)
+                {
+                    <a class="evo" href="@Url.Action("Detalle", "Digimon", new { id = e.Id })">
+                        @if (!string.IsNullOrEmpty(e.Image))
+                        {<img src="@e.Image" alt="" />}
+                        <span>@(e.Digimon)@if (!string.IsNullOrEmpty(e.Condition))
+                        {<small>@e.Condition</small>}</span>
+                    </a>
+                }
+            </div>
+        }
+    </section>
+}
+
